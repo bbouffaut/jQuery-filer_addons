@@ -1,0 +1,15 @@
+{
+  "name": "jquery.filer",
+  "version": "1.0.4-bbo",
+  "main": "js/jquery.filer.js",
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "test"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "jquery": ">= 1.7.2",
+    "exif-js": ">=2.1.1"
+  }
+}
