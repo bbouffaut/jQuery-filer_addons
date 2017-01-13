@@ -1,6 +1,6 @@
 {
   "name": "jquery.filer",
-  "version": "1.0.5_bbo",
+  "version": "1.0.5",
   "title": "jQuery.filer - Simple HTML5 file uploader plugin tool for jQuery.",
   "description": "jQuery.filer - Simple HTML5 file uploader, a plugin tool for jQuery which change completely file input and make it with multiple file selection, drag&drop support, different validations, thumbnails, icons, instant upload, print-screen upload and many other features and options.",
   "keywords": [
