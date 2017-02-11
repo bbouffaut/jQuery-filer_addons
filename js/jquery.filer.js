@@ -469,6 +469,9 @@
  			}
  		},
  		_upload: function(i) {
+ 			//DEBUG BBO
+ 			console.log('_upload',i);
+ 			
  			var el = f._itFc.html,
  			formData = new FormData(),
  			exif_tags = EXIF.getAllTags(f._itFc.file);
@@ -585,6 +588,9 @@
  			}
  		},
  		_clipboardPaste: function(e, fromDrop) {
+ 			//DEBUG BBO
+ 			console.log('_clipboardPaste',e,fromDrop);
+
  			if(!fromDrop && (!e.originalEvent.clipboardData && !e.originalEvent.clipboardData.items)) {
  				return
  			}
@@ -643,6 +649,9 @@
  			}
  		},
  		_onSelect: function(i) {
+ 			//DEBUG BBO
+ 			console.log('_onSelect',i);
+
  			if(n.uploadFile && !$.isEmptyObject(n.uploadFile)) {
  				f._upload(i)
  			}
@@ -652,6 +661,9 @@
  			}
  		},
  		_onChange: function(e, d) {
+ 			//DEBUG BBO
+ 			console.log('_onChange',e,d);
+
  			if(!d) {
  				if(!s.get(0)
  					.files || typeof s.get(0)
@@ -841,6 +853,9 @@
  			callback(el, id);
  		},
  		_addToMemory: function(i) {
+ 			//DEBUG BBO
+ 			console.log('_addToMemory',i);
+
  			f._itFl.push({
  				id: f._itFl.length,
  				file: f.files[i],
