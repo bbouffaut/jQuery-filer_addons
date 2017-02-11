@@ -482,7 +482,7 @@
  			}
 
  			formData.append(s.attr('name'), f._itFc.file, (f._itFc.file.name ? f._itFc.file.name : false));
- 			formData.append('lastModifiedDate', (f._itFc.file.lastModifiedDate ? f._itFc.file.lastModifiedDate : false)); //BBO: need to send lastModified as well
+ 			formData.append('lastModified', (f._itFc.file.lastModifiedDate ? f._itFc.file.lastModifiedDate : false)); //BBO: need to send lastModified as well
  			if(n.uploadFile.data != null && $.isPlainObject(n.uploadFile.data)) {
  				for(var k in n.uploadFile.data) {
  					formData.append(k, n.uploadFile.data[k]);
