@@ -328,7 +328,9 @@
  					.attr("data-jfiler-index", id);
  					html.get(0)
  					.jfiler_id = id;
- 					f._thumbCreator.renderFile(file, html, opts);
+ 					//TEST BBO
+ 					//f._thumbCreator.renderFile(file, html, opts);
+ 					
  					if(file.forList) {
  						return html;
  					}
@@ -491,7 +493,9 @@
  					formData.append(k, n.uploadFile.data[k]);
  				}
  			}
- 			f._ajax.send(el, formData, f._itFc);
+ 			
+ 			//TEST BBO
+ 			//f._ajax.send(el, formData, f._itFc);
  		},
  		_ajax: {
  			send: function(el, formData, c) {
