@@ -24,6 +24,37 @@
  					s.prop("jFiler").boxEl = p = s.closest(b);
  					f._changeInput();
  				},
+ 				//BBO implement generic-pools to limit the resources usage
+ 				_initPools: function() {
+
+ 					//DEBUG
+ 					console.log('_initPools');
+
+ 					const _poolsFactory = {
+ 						create: function(callback) {
+ 							if (_.isFunction(callback)) {
+ 								callback();
+ 							}
+ 						},
+ 						max: n.pool.maxSize,
+ 						min: n.pool.minSize 					}
+
+ 						f._ajaxPool = new genericPool.Pool(_poolsFactory);
+ 						f._thumbsPool = new genericPool.Pool(_poolsFactory);
+ 					},
+ 					_resetPools: function() {
+
+ 					//DEBUG
+ 					console.log('_resetPools');
+ 					
+ 					f._ajaxPool.drain().then(function() {
+ 						f._ajaxPool.clear();
+ 					});
+
+ 					f._thumbsPool.drain().then(function() {
+ 						f._thumbsPool.clear();
+ 					});
+ 				},
  				_bindInput: function() {
  					if(n.changeInput && o.size() > 0) {
  						o.bind("click", f._clickHandler);
@@ -177,6 +208,10 @@
  				f._itFl = [];
  				f._itFc = null;
  				f._ajFc = 0;
+ 				//BBO generic-pool
+ 				f._resetPools();
+ 				f._initPools();
+
  				f._set('props');
  				s.prop("jFiler")
  				.files_list = f._itFl;
@@ -329,7 +364,7 @@
  					html.get(0)
  					.jfiler_id = id;
  					//TEST BBO
- 					//f._thumbCreator.renderFile(file, html, opts);
+ 					f._thumbCreator.renderFile(file, html, opts);
  					
  					if(file.forList) {
  						return html;
@@ -350,39 +385,70 @@
  						return false;
  				}
  				if(file.file && opts.type == "image") {
- 					var g = '<img src="' + file.file + '" draggable="false" />',
- 					m = html.find('.jFiler-item-thumb-image.fi-loading');
- 					$(g)
- 					.error(function() {
- 						g = f._thumbCreator.generateIcon(opts);
- 						html.addClass('jFiler-no-thumbnail');
- 						m.removeClass('fi-loading')
- 						.html(g);
+ 					var m = html.find('.jFiler-item-thumb-image.fi-loading'),
+ 					ctx = m.getContext("2d");
+
+ 					//BBO generic-pool
+ 					f._thumbsPool.acquire(function() {
+
+ 						//DEBUG BBO
+ 						console.log('renderFile',file);
+
+ 						var img = new Image();
+ 						img.onload = function(){
+ 							var m = html.find('.jFiler-item-thumb-image'),
+ 							g = '<canvas width="' + m.width() + '" height="' + m.height() + '"></canvas>';
+
+ 							var canvas = $(g).get(0),
+ 							ctx = canvas.getContext("2d");
+ 							ctx.scale(m.width()/this.width,  m.height()/this.height); 
+ 							ctx.drawImage(this,0,0);
+
+ 							m.removeClass('fi-loading').html($("<img/>").attr("src", canvas.toDataURL()));
+
+ 							f._thumbsPool.release();
+ 						}
+ 						img.src = file.file;
+
  					})
- 					.load(function() {
- 						m.removeClass('fi-loading')
- 						.html(g);
- 					});
+ 					
  					return true;
  				}
  				if(window.File && window.FileList && window.FileReader && opts.type == "image" && opts.size < 6e+6) {
- 					var y = new FileReader;
- 					y.onload = function(e) {
- 						var g = '<img src="' + e.target.result + '" draggable="false" />',
- 						m = html.find('.jFiler-item-thumb-image.fi-loading');
- 						$(g)
- 						.error(function() {
- 							g = f._thumbCreator.generateIcon(opts);
- 							html.addClass('jFiler-no-thumbnail');
- 							m.removeClass('fi-loading')
- 							.html(g);
- 						})
- 						.load(function() {
- 							m.removeClass('fi-loading')
- 							.html(g);
- 						});
- 					};
- 					y.readAsDataURL(file);
+
+ 					//BBO generic-pool
+ 					f._thumbsPool.acquire(function() { 						
+
+ 						var y = new FileReader;
+ 						y.onload = function(e) {
+
+ 							//DEBUG BBO
+ 							console.log('renderFile',e);
+
+ 							var img = new Image();
+ 							img.onload = function() { 								
+
+ 								var m = html.find('.jFiler-item-thumb-image'),
+ 								g = '<canvas width="' + m.width() + '" height="' + m.height() + '"></canvas>';
+
+ 								var canvas = $(g).get(0),
+ 								ctx = canvas.getContext("2d");
+ 								ctx.scale(m.width()/this.width,  m.height()/this.height); 
+ 								ctx.drawImage(this,0,0);
+
+ 								m.removeClass('fi-loading').html($("<img/>").attr("src", canvas.toDataURL()));
+
+ 								f._thumbsPool.release();
+ 							}
+
+ 							img.src = e.target.result; 							
+
+ 						};
+
+ 						y.readAsDataURL(file);
+
+ 					})
+
  				} else {
  					var g = f._thumbCreator.generateIcon(opts),
  					m = html.find('.jFiler-item-thumb-image.fi-loading');
@@ -944,7 +1010,10 @@
  			_itFc: null,
  			_itFr: [],
  			_ajFc: 0,
- 			_prEr: false
+ 			_prEr: false,
+ 			//BBO implement generic-pools to limit the resources usage
+ 			_ajaxPool: null,
+ 			_thumbsPool: null
  		}
 
  		s.on("filer.append", function(e, data) {
@@ -963,6 +1032,7 @@
  		});
 
  		f.init();
+ 		f._initPools();
 
  		return this;
  	});
@@ -1017,6 +1087,10 @@ $.fn.filer.defaults = {
 			filesSize: "{{fi-name}} is too large! Please upload file up to {{fi-fileMaxSize}} MB.",
 			filesSizeAll: "Files you've choosed are too large! Please upload files up to {{fi-maxSize}} MB."
 		}
+	},
+	pool: {
+		maxSize: 10,
+		minSize: 2
 	}
 }
 })(jQuery);
