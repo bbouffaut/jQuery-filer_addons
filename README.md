@@ -1,6 +1,12 @@
 # jQuery-filer_addons
 Fork of jQuery-filer from CreativeDream including some addons: 
-- Queuing of files loading
+- Implement html5 canvas to generate images thumbs
+- Queue images thumbs generation
+- Queue images ajax uploading
+
+#Requirements:
+- browser version of nodejs generic-pool (using browserify)
+- HTML5 promises
 
 # Dev notes
 ## what happens when somes files are selected (drag&drop or _clipboardPaste)

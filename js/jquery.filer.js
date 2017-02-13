@@ -560,8 +560,11 @@
  				}
  			}
  			
- 			//TEST BBO
- 			//f._ajax.send(el, formData, f._itFc);
+ 			//BBO Implement generic-pool for ajax uploading
+ 			f._ajaxPool.acquire(function() {
+ 				f._ajax.send(el, formData, f._itFc);
+ 			})
+ 			
  		},
  		_ajax: {
  			send: function(el, formData, c) {
@@ -586,6 +589,10 @@
  							f._ajFc = 0;
  							n.uploadFile.onComplete != null && typeof n.uploadFile.onComplete == "function" ? n.uploadFile.onComplete(l, p, o, s, jqXHR, textStatus) : null;
  						}
+
+ 						//BBO Implement generic-pool for ajax uploading
+ 						f._ajaxPool.release();
+ 						
  					},
  					beforeSend: function(jqXHR, settings) {
  						return n.uploadFile.beforeSend != null && typeof n.uploadFile.beforeSend == "function" ? n.uploadFile.beforeSend(el, l, p, o, s, c.id, jqXHR, settings) : true;
